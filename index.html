@@ -1079,6 +1079,55 @@
     alert("Inzerát byl odeslán!");
     document.getElementById("adModal").classList.add("hidden");
   };
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ... (konfigurace firebase zůstává stejná)
+
+// Funkce pro načtení dat
+async function nacistInzeraty() {
+    const querySnapshot = await getDocs(collection(db, "inzeraty"));
+    const nacteneInzeraty = [];
+    
+    querySnapshot.forEach((doc) => {
+        nacteneInzeraty.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Zde buď nahraďte existující pole 'listings'
+    // nebo vytvořte funkci, která je vykreslí do 'listingsGrid'
+    console.log("Načtené inzeráty:", nacteneInzeraty);
+    
+    // Příklad vložení do gridu (jednodušší verze)
+    renderFirebaseListings(nacteneInzeraty);
+}
+function renderFirebaseListings(data) {
+    const grid = document.getElementById("listingsGrid");
+    // Grid vyčistíme nebo jen přidáme nový (záleží, zda chcete kombinovat s testovacími daty)
+    
+    data.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-xl shadow-sm border border-stone-200/60 p-5";
+        card.innerHTML = `
+            <h3 class="font-bold">${item.title}</h3>
+            <p class="text-sm">${item.desc}</p>
+            <div class="text-amber-800 font-bold mt-2">${item.price} Kč</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+// Upravená funkce pro uložení, která po uložení znovu načte data
+window.ulozitInzerat = async () => {
+    const title = document.getElementById("formTitle").value;
+    const desc = document.getElementById("formDesc").value;
+    const price = parseInt(document.getElementById("formPrice").value);
+
+    await addDoc(collection(db, "inzeraty"), { title, desc, price, date: "Dnes", category: "prodej" });
+
+    alert("Inzerát byl odeslán!");
+    document.getElementById("adModal").classList.add("hidden");
+    
+    // Znovu načíst seznam
+    nacistInzeraty();
+};
 </script>
 <div id="adModal" class="hidden fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
     <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
