@@ -33,9 +33,9 @@
                     </span>
                     <input type="text" id="searchInput" placeholder="Hledat mezi inzeráty..." class="w-full pl-10 pr-4 py-2 rounded-lg bg-stone-800 text-white placeholder-stone-400 border border-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
-                <button onclick="alert('Pro ukládání inzerátů je potřeba napojit databázi.')" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2 rounded-lg transition duration-200 flex items-center gap-1.5 shrink-0 shadow-sm">
-                    <i data-lucide="plus-circle" class="w-5 h-5"></i> Přidat
-                </button>
+                <button onclick="document.getElementById('adModal').classList.remove('hidden')" class="...">
+    <i data-lucide="plus-circle" class="w-5 h-5"></i> Přidat
+</button>
             </div>
         </div>
     </header>
@@ -1047,39 +1047,76 @@
             setupEquipmentFilterListeners();
             renderListings(listings);
             updateMapMarkers(listings);
+            nacistInzeraty();
             lucide.createIcons();
         };
-</script>
-    <form id="inzeratForm">
-        <input type="text" id="nadpis" placeholder="Nadpis" required>
-        <input type="text" id="popis" placeholder="Popis" required>
-        <input type="number" id="cena" placeholder="Cena" required>
-        <button type="submit">Přidat inzerát</button>
-    </form>
-
-    <script>
-        async function ulozInzerat(event) {
-            event.preventDefault();
-            const data = {
-                nadpis: document.getElementById('nadpis').value,
-                popis: document.getElementById('popis').value,
-                cena: document.getElementById('cena').value
-            };
-            const apiURL = 'https://sheetdb.io/api/v1/3ku3s18jpeql4';
-            const response = await fetch(apiURL, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: [data] })
-            });
-            if (response.ok) {
-                alert("Inzerát úspěšně přidán!");
-                document.getElementById('inzeratForm').reset();
-            } else {
-                alert("Chyba při zápisu.");
-            }
-        }
-        document.getElementById('inzeratForm').addEventListener('submit', ulozInzerat);
     </script>
-</form>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // SEM VLOŽTE SVŮJ ZKOPÍROVANÝ OBJEKT
+  const firebaseConfig = {
+  apiKey: "AIzaSyCYCpNA4pnI9YDfQxl7r8mmkqfh_fqt5c4",
+  authDomain: "koko-91f01.firebaseapp.com",
+  projectId: "koko-91f01",
+  storageBucket: "koko-91f01.firebasestorage.app",
+  messagingSenderId: "581252259926",
+  appId: "1:581252259926:web:64b26022719492882b5bf7",
+  measurementId: "G-1D40DKWTQC"
+};
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Funkce pro načtení a vykreslení inzerátů
+async function nacistInzeraty() {
+    const querySnapshot = await getDocs(collection(db, "inzeraty"));
+    const nactenaData = [];
+    
+    querySnapshot.forEach((doc) => {
+        nactenaData.push(doc.data());
+    });
+
+    // Nyní zavoláme vaši stávající funkci pro vykreslení
+    // (předpokládám, že se jmenuje renderListings)
+    renderListings(nactenaData);
+}
+
+  // Funkce, kterou propojí formulář s databází
+  window.ulozitInzerat = async () => {
+    try {
+        await addDoc(collection(db, "inzeraty"), {
+            title: document.getElementById("formTitle").value,
+            desc: document.getElementById("formDesc").value,
+            price: document.getElementById("formPrice").value,
+            category: document.getElementById("formCat").value,
+            timestamp: new Date()
+        });
+        alert("Inzerát byl úspěšně uložen!");
+        document.getElementById("adModal").classList.add("hidden");
+    } catch (e) {
+        alert("Chyba při ukládání: " + e.message);
+    }
+  };
+</script>
+<div id="adModal" class="hidden fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-white p-6 rounded-xl w-full max-w-md">
+        <h2 class="text-xl font-bold mb-4">Přidat inzerát</h2>
+        <input type="text" id="formTitle" placeholder="Nadpis" class="w-full border p-2 mb-3 rounded">
+        <textarea id="formDesc" placeholder="Popis" class="w-full border p-2 mb-3 rounded"></textarea>
+        <input type="number" id="formPrice" placeholder="Cena (Kč)" class="w-full border p-2 mb-3 rounded">
+        <select id="formCat" class="w-full border p-2 mb-4 rounded">
+            <option value="prodej">Koně na prodej</option>
+            <option value="ustajeni">Ustájení</option>
+            <option value="vybaveni">Vybavení</option>
+        </select>
+        <div class="flex gap-2">
+            <button onclick="document.getElementById('adModal').classList.add('hidden')" class="w-full bg-stone-200 py-2 rounded">Zrušit</button>
+            <button onclick="ulozitInzerat()" class="w-full bg-amber-600 text-white py-2 rounded">Uložit</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
