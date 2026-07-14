@@ -17,7 +17,6 @@
             z-index: 10;
         }
     </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-stone-50 text-stone-800 font-sans min-h-screen flex flex-col">
 
@@ -1051,41 +1050,36 @@
             lucide.createIcons();
         };
 </script>
+    <form id="inzeratForm">
+        <input type="text" id="nadpis" placeholder="Nadpis" required>
+        <input type="text" id="popis" placeholder="Popis" required>
+        <input type="number" id="cena" placeholder="Cena" required>
+        <button type="submit">Přidat inzerát</button>
+    </form>
+
     <script>
-    // Inicializace Supabase
-    const supabaseUrl = 'https://safphxvsdqwmnkyurmnp.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhZnBoeHZzZHF3bW5reXVybW5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNDg4NjksImV4cCI6MjA5OTYyNDg2OX0.wWFnEuzwQyUSZv30epCyrFriSSb9fDO45fWcJMM5S7c'; // Ujistěte se, že je v uvozovkách!
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    // Funkce pro odeslání inzerátu
-    async function ulozInzerat(event) {
-        event.preventDefault(); // Zastaví obnovení stránky
-        
-        const nadpis = document.getElementById('nadpis').value;
-        const popis = document.getElementById('popis').value;
-        const cena = document.getElementById('cena').value;
-
-        const { data, error } = await supabase
-            .from('inzeraty')
-            .insert([{ nadpis: nadpis, popis: popis, cena: cena }]);
-
-        if (error) {
-            console.error("Chyba při ukládání:", error);
-            alert("Chyba: " + error.message);
-        } else {
-            alert("Inzerát úspěšně přidán!");
-            document.getElementById('inzeratForm').reset();
+        async function ulozInzerat(event) {
+            event.preventDefault();
+            const data = {
+                nadpis: document.getElementById('nadpis').value,
+                popis: document.getElementById('popis').value,
+                cena: document.getElementById('cena').value
+            };
+            const apiURL = 'https://sheetdb.io/api/v1/3ku3s18jpeql4';
+            const response = await fetch(apiURL, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: [data] })
+            });
+            if (response.ok) {
+                alert("Inzerát úspěšně přidán!");
+                document.getElementById('inzeratForm').reset();
+            } else {
+                alert("Chyba při zápisu.");
+            }
         }
-    }
-
-    // Propojení s formulářem
-    document.getElementById('inzeratForm').addEventListener('submit', ulozInzerat);
-</script>
-<form id="inzeratForm">
-    <input type="text" id="nadpis" placeholder="Název inzerátu" required>
-    <textarea id="popis" placeholder="Popis"></textarea>
-    <input type="number" id="cena" placeholder="Cena">
-    <button type="submit">Přidat inzerát</button>
+        document.getElementById('inzeratForm').addEventListener('submit', ulozInzerat);
+    </script>
 </form>
 </body>
 </html>
