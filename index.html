@@ -1045,7 +1045,7 @@
             setupBoardingFilterListeners();
             setupFeedFilterListeners();
             setupEquipmentFilterListeners();
-            renderListings(listings);
+            nacistInzeratyZFirebase();
             updateMapMarkers(listings);
             nacistInzeraty();
             lucide.createIcons();
@@ -1079,6 +1079,22 @@
     alert("Inzerát byl odeslán!");
     document.getElementById("adModal").classList.add("hidden");
   };
+
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+async function nacistInzeratyZFirebase() {
+    const inzeratyRef = collection(db, "inzeraty");
+    const querySnapshot = await getDocs(inzeratyRef);
+    
+    const nactenaData = [];
+    querySnapshot.forEach((doc) => {
+        // Převede Firebase formát na to, co váš web umí zobrazit
+        nactenaData.push(doc.data());
+    });
+
+    // Tímto přepíšeme původní proměnnou a vykreslíme inzeráty
+    renderListings(nactenaData);
+}
 </script>
 <div id="adModal" class="hidden fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
     <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
