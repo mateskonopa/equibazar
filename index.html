@@ -1045,52 +1045,40 @@
             setupBoardingFilterListeners();
             setupFeedFilterListeners();
             setupEquipmentFilterListeners();
-            nacistInzeratyZFirebase();
+            renderListings(listings);
             updateMapMarkers(listings);
             nacistInzeraty();
             lucide.createIcons();
         };
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 1. VAŠE KONFIGURACE
-    const firebaseConfig = {
-        apiKey: "VASE_API_KEY",
-        authDomain: "vase-id.firebaseapp.com",
-        projectId: "vase-id",
-        storageBucket: "vase-id.appspot.com",
-        messagingSenderId: "...",
-        appId: "..."
-    };
+  // SEM VLOŽTE SVŮJ ZKOPÍROVANÝ OBJEKT
+  const firebaseConfig = {
+  apiKey: "AIzaSyCYCpNA4pnI9YDfQxl7r8mmkqfh_fqt5c4",
+  authDomain: "koko-91f01.firebaseapp.com",
+  projectId: "koko-91f01",
+  storageBucket: "koko-91f01.firebasestorage.app",
+  messagingSenderId: "581252259926",
+  appId: "1:581252259926:web:64b26022719492882b5bf7",
+  measurementId: "G-1D40DKWTQC"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    // 2. FUNKCE PRO ULOŽENÍ (propojená s tlačítkem Uložit)
-    window.ulozitInzerat = async () => {
-        const title = document.getElementById("formTitle").value;
-        const desc = document.getElementById("formDesc").value;
-        const price = document.getElementById("formPrice").value;
+  window.ulozitInzerat = async () => {
+    const title = document.getElementById("formTitle").value;
+    const desc = document.getElementById("formDesc").value;
+    const price = document.getElementById("formPrice").value;
 
-        await addDoc(collection(db, "inzeraty"), { title, desc, price, date: new Date().toISOString() });
-        alert("Inzerát byl přidán!");
-        document.getElementById("adModal").classList.add("hidden");
-        nacistZFirebase(); // Načte seznam znovu
-    };
+    await addDoc(collection(db, "inzeraty"), { title, desc, price, date: new Date().toISOString() });
 
-    // 3. FUNKCE PRO NAČTENÍ (volá vaši existující funkci renderListings)
-    window.nacistZFirebase = async () => {
-        const snapshot = await getDocs(collection(db, "inzeraty"));
-        const data = [];
-        snapshot.forEach(doc => data.push(doc.data()));
-        
-        // ZAVOLÁME VAŠI EXISTUJÍCÍ FUNKCI V SOUBORU
-        renderListings(data); 
-    };
-
-    // Automatické načtení při startu
-    nacistZFirebase();
+    alert("Inzerát byl odeslán!");
+    document.getElementById("adModal").classList.add("hidden");
+  };
 </script>
 <div id="adModal" class="hidden fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
     <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
